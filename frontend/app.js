@@ -671,7 +671,7 @@ const App = (() => {
           <p>Real-time monitoring and historical activity logs.</p>
         </div>
         <div class="page-header-actions">
-          <button class="btn btn-outline" onclick="App._renderIncidents(document.getElementById('main-content'))"><span class="material-symbols-outlined" style="font-size:1.125rem">filter_list</span> Filter</button>
+          <button class="btn btn-primary" onclick="App._openIncidentModal()"><span class="material-symbols-outlined" style="font-size:1.125rem">add_circle</span> Log Incident</button>
           <button class="btn btn-outline" onclick="Export.downloadCSV()"><span class="material-symbols-outlined" style="font-size:1.125rem">download</span> Export</button>
         </div>
       </div>
@@ -690,27 +690,26 @@ const App = (() => {
       const cat = Methodology.getCategoryMeta(inc.category);
       const sev = Methodology.getSeverityMeta(inc.severity);
       return `
-            <div class="incident-card">
-              <div class="incident-card-img">
-                <div class="category-icon"><span class="material-symbols-outlined" style="color:${catColors[inc.category] || '#64748b'}">${catIcons[inc.category] || 'info'}</span></div>
-              </div>
-              <div class="incident-card-body">
-                <div>
-                  <div class="incident-card-meta">
-                    <span class="incident-card-category" style="color:${catColors[inc.category]}">${cat.label}</span>
-                    <span class="incident-card-time">${Utils.formatDateTime(inc.timestamp)}</span>
-                  </div>
-                  <h3 class="incident-card-title">${Utils.escapeHtml(inc.description || cat.label + ' Incident')}</h3>
-                  <p class="incident-card-desc">${Utils.escapeHtml(inc.context || cat.desc)}</p>
+            <div class="glass" style="padding:0;overflow:hidden" id="incident-item-${inc.id}">
+              <div style="display:flex;align-items:center;gap:1rem;padding:1.25rem 1.5rem;cursor:pointer" onclick="App._viewIncidentDetail('${inc.id}')">
+                <div style="width:3rem;height:3rem;border-radius:var(--radius-xl);background:${catColors[inc.category] || '#64748b'}15;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <span class="material-symbols-outlined" style="color:${catColors[inc.category] || '#64748b'};font-size:1.5rem">${catIcons[inc.category] || 'info'}</span>
                 </div>
-                <div class="incident-card-footer">
-                  <div class="incident-card-badges">
-                    <span class="badge ${sev.badge}">${sev.label}</span>
-                    <span class="badge badge-${inc.status === 'resolved' ? 'info' : 'muted'}">${inc.status}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem">
+                    <span style="font-size:0.625rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:${catColors[inc.category]}">${cat.label}</span>
+                    <span style="font-size:0.75rem;color:var(--text-500)">${Utils.formatDateTime(inc.timestamp)}</span>
                   </div>
-                  <span class="view-details-btn">View Details <span class="material-symbols-outlined" style="font-size:1rem">arrow_forward</span></span>
+                  <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.25rem">${Utils.escapeHtml(inc.description || cat.label + ' Incident')}</h3>
+                  <p style="font-size:0.875rem;color:var(--text-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${Utils.escapeHtml(inc.context || cat.desc)}</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0">
+                  <span class="badge ${sev.badge}">${sev.label}</span>
+                  <span class="badge badge-${inc.status === 'resolved' ? 'info' : 'muted'}">${inc.status}</span>
+                  <span class="material-symbols-outlined" style="font-size:1.25rem;color:var(--primary)">expand_more</span>
                 </div>
               </div>
+              <div id="incident-detail-${inc.id}" style="display:none"></div>
             </div>
           `;
     }).join('')}
@@ -725,6 +724,63 @@ const App = (() => {
           <button class="page-btn" onclick="App._goToIncidentPage(${Math.min(result.totalPages, _incidentPage + 1)})"><span class="material-symbols-outlined">chevron_right</span></button>
         </div>
       ` : ''}
+    `;
+  }
+
+  async function _viewIncidentDetail(incidentId) {
+    const detailEl = document.getElementById(`incident-detail-${incidentId}`);
+    if (!detailEl) return;
+
+    // Toggle off if already open
+    if (detailEl.style.display === 'block') {
+      detailEl.style.display = 'none';
+      return;
+    }
+
+    const incident = await DB.get('incidents', incidentId);
+    if (!incident) return;
+
+    const cat = Methodology.getCategoryMeta(incident.category);
+    const sev = Methodology.getSeverityMeta(incident.severity);
+    const analysis = incident.aiAnalysis;
+
+    detailEl.style.display = 'block';
+    detailEl.innerHTML = `
+      <div style="padding:0 1.5rem 1.5rem;border-top:1px solid var(--border-light)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+          <div>
+            <p style="font-size:0.75rem;font-weight:700;color:var(--text-400);text-transform:uppercase;margin-bottom:0.5rem">Incident Details</p>
+            <div class="space-y-4" style="font-size:0.875rem">
+              <div><span style="color:var(--text-500)">Category:</span> <strong>${cat.label}</strong></div>
+              <div><span style="color:var(--text-500)">Severity:</span> <span class="badge ${sev.badge}">${sev.label}</span></div>
+              <div><span style="color:var(--text-500)">Status:</span> <span class="badge badge-${incident.status === 'resolved' ? 'info' : 'muted'}">${incident.status}</span></div>
+              <div><span style="color:var(--text-500)">Student:</span> ${Utils.escapeHtml(incident.studentName || 'Unknown')}</div>
+              <div><span style="color:var(--text-500)">Time:</span> ${Utils.formatDateTime(incident.timestamp)}</div>
+              ${incident.description ? `<div><span style="color:var(--text-500)">Description:</span> ${Utils.escapeHtml(incident.description)}</div>` : ''}
+              ${incident.context ? `<div><span style="color:var(--text-500)">Context:</span> ${Utils.escapeHtml(incident.context)}</div>` : ''}
+            </div>
+          </div>
+          <div>
+            <p style="font-size:0.75rem;font-weight:700;color:var(--text-400);text-transform:uppercase;margin-bottom:0.5rem">Analysis & Response</p>
+            ${analysis ? `
+              <div class="space-y-4" style="font-size:0.875rem">
+                <div><span style="color:var(--text-500)">Recommended:</span> <strong>${Utils.escapeHtml(analysis.recommendedResponse)}</strong></div>
+                ${analysis.script ? `<div style="padding:0.75rem;background:var(--text-100);border-radius:var(--radius);font-style:italic;color:var(--text-600)">${Utils.escapeHtml(analysis.script)}</div>` : ''}
+                ${analysis.restorative ? `<div><span style="color:var(--text-500)">Restorative:</span> ${Utils.escapeHtml(analysis.restorative)}</div>` : ''}
+                ${analysis.preventionTip ? `<div><span style="color:var(--text-500)">Prevention:</span> ${Utils.escapeHtml(analysis.preventionTip)}</div>` : ''}
+                <div><span style="color:var(--text-500)">Source:</span> ${analysis.source === 'ai' ? 'AI Analysis' : 'Deterministic Logic'}</div>
+                ${analysis.parentEscalation ? '<div><span class="badge badge-warning">Parent Escalation Required</span></div>' : ''}
+              </div>
+            ` : '<p style="color:var(--text-400);font-size:0.875rem">No analysis available for this incident.</p>'}
+          </div>
+        </div>
+        ${incident.appliedAction ? `
+          <div style="margin-top:1rem;padding:0.75rem;background:var(--emerald-bg);border-radius:var(--radius);border:1px solid rgba(16,185,129,0.2)">
+            <p style="font-size:0.75rem;font-weight:700;color:var(--emerald);text-transform:uppercase">Action Applied</p>
+            <p style="font-size:0.875rem;margin-top:0.25rem">${Utils.escapeHtml(incident.appliedAction.action)}</p>
+          </div>
+        ` : ''}
+      </div>
     `;
   }
 
@@ -1097,7 +1153,7 @@ const App = (() => {
     _applyAction, _toggleGoal, _filterIncidents, _goToIncidentPage,
     _switchMethodologyTab, _saveMethodology, _resetMethodology,
     _saveSettings, _testConnection,
-    _changeStudentAndRefresh, _renderIncidents,
+    _changeStudentAndRefresh, _renderIncidents, _viewIncidentDetail,
     _addStudent, _deleteStudent, _editStudentInline, _saveStudentEdit
   };
 })();
