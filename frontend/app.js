@@ -443,9 +443,14 @@ const App = (() => {
 
   // ===================== METHODOLOGY VIEW =====================
 
+  let _activeBand = 'C';
+  let _editableConfig = null;
+
   async function _renderMethodology(container) {
-    const config = Methodology.getDefaultConfig();
-    const bands = Object.entries(config.bands);
+    // Load saved config or use defaults
+    const saved = await DB.get('methodology', 'default');
+    _editableConfig = saved?.config || Methodology.getDefaultConfig();
+    const bands = Object.entries(_editableConfig.bands);
 
     container.innerHTML = `
       <div class="page-header-row">
@@ -459,113 +464,194 @@ const App = (() => {
           <p>Configure automated grade bands and behavioral session consequences</p>
         </div>
         <div class="page-header-actions">
-          <button class="btn btn-outline">Discard</button>
-          <button class="btn btn-primary" onclick="App.showToast('Configuration saved')">Save Changes</button>
+          <button class="btn btn-outline" onclick="App._resetMethodology()">Reset to Defaults</button>
+          <button class="btn btn-primary" onclick="App._saveMethodology()">Save Changes</button>
         </div>
       </div>
 
       <div class="tabs mb-8">
-        ${bands.map(([key, b], i) => `
-          <button class="tab-btn ${i === 2 ? 'active' : ''}" data-band="${key}" onclick="App._switchMethodologyTab(this)">${b.label.split('—')[1]?.trim() || b.label}</button>
+        ${bands.map(([key, b]) => `
+          <button class="tab-btn ${key === _activeBand ? 'active' : ''}" data-band="${key}" onclick="App._switchMethodologyTab(this)">${b.label.split('—')[1]?.trim() || b.label}</button>
         `).join('')}
       </div>
 
       <div style="max-width:64rem" class="space-y-4" id="methodology-sections">
-        ${_renderMethodologySections(bands[2][1])}
+        ${_renderMethodologySections(_editableConfig.bands[_activeBand], _activeBand)}
       </div>
 
       <div class="preview-banner">
         <div class="preview-icon"><span class="material-symbols-outlined" style="font-size:1.5rem">visibility</span></div>
         <div style="flex:1">
           <h3 style="font-weight:700">Logic Preview</h3>
-          <p style="font-size:0.875rem;color:var(--text-600);margin-top:0.25rem">Based on the current settings, the system will apply a <strong>Strict</strong> monitoring profile. Students will have 2 warning attempts before automated reporting is triggered.</p>
-          <div style="display:flex;gap:1rem;margin-top:1rem">
-            <div style="display:flex;align-items:center;gap:0.5rem"><div style="width:0.5rem;height:0.5rem;border-radius:50%;background:var(--emerald)"></div><span style="font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-500)">Accuracy: 98.4%</span></div>
-            <div style="display:flex;align-items:center;gap:0.5rem"><div style="width:0.5rem;height:0.5rem;border-radius:50%;background:var(--primary)"></div><span style="font-size:0.625rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-500)">Latency: < 200ms</span></div>
-          </div>
+          <p style="font-size:0.875rem;color:var(--text-600);margin-top:0.25rem" id="methodology-preview-text">Based on current settings for <strong>${_editableConfig.bands[_activeBand].label}</strong>: Warning at <strong>${_editableConfig.bands[_activeBand].thresholds.warningCount}</strong> incidents, escalation at <strong>${_editableConfig.bands[_activeBand].thresholds.escalateCount}</strong>. Critical auto-stop is <strong>${_editableConfig.bands[_activeBand].thresholds.criticalAutoStop ? 'enabled' : 'disabled'}</strong>.</p>
         </div>
       </div>
     `;
   }
 
-  function _renderMethodologySections(band) {
-    const categories = Methodology.getAllCategories().slice(0, 4);
+  function _renderMethodologySections(band, bandKey) {
+    const th = band.thresholds;
+    const sevLabels = { 1: 'Minor (Level 1)', 2: 'Moderate (Level 2)', 3: 'Major (Level 3)', 4: 'Critical (Level 4)' };
+    const sevColors = { 1: '#10b981', 2: '#f59e0b', 3: '#f97316', 4: '#ef4444' };
+
     return `
       <div class="accordion">
         <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
           <div class="accordion-header-left">
-            <div class="accordion-icon" style="background:rgba(249,115,22,0.1);color:#f97316"><span class="material-symbols-outlined">category</span></div>
-            <div><h3 style="font-weight:700">Behavioral Categories</h3><p style="font-size:0.75rem;color:var(--text-500)">Define weighted categories for behavioral analysis</p></div>
+            <div class="accordion-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6"><span class="material-symbols-outlined">tune</span></div>
+            <div><h3 style="font-weight:700">Threshold Settings</h3><p style="font-size:0.75rem;color:var(--text-500)">Configure warning and escalation trigger points</p></div>
           </div>
           <span class="material-symbols-outlined" style="color:var(--text-400)">expand_more</span>
         </div>
         <div class="accordion-body">
-          <div class="grid-2">
-            ${categories.slice(0, 2).map((cat, i) => `
-              <div style="padding:1rem;border-radius:var(--radius-xl);border:1px solid var(--text-100);background:var(--text-100)">
-                <div style="display:flex;justify-content:space-between;margin-bottom:0.75rem">
-                  <span style="font-size:0.875rem;font-weight:700">${cat.label}</span>
-                  <span class="badge badge-info">Weight: ${i === 0 ? '40' : '25'}%</span>
+          <div class="grid-3">
+            <div class="config-box">
+              <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">warning</span><span class="config-box-label">Warning Count</span></div>
+              <input type="number" class="form-input" id="meth-warning" value="${th.warningCount}" min="1" max="10" style="text-align:center">
+              <p style="font-size:0.625rem;color:var(--text-400);margin-top:0.25rem">Incidents before warning state</p>
+            </div>
+            <div class="config-box">
+              <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">gpp_maybe</span><span class="config-box-label">Escalation Count</span></div>
+              <input type="number" class="form-input" id="meth-escalate" value="${th.escalateCount}" min="1" max="15" style="text-align:center">
+              <p style="font-size:0.625rem;color:var(--text-400);margin-top:0.25rem">Incidents before critical state</p>
+            </div>
+            <div class="config-box">
+              <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">block</span><span class="config-box-label">Critical Auto-Stop</span></div>
+              <label class="toggle" style="margin-top:0.5rem"><input type="checkbox" id="meth-autostop" ${th.criticalAutoStop ? 'checked' : ''}><span class="toggle-track"></span><span style="margin-left:0.75rem;font-size:0.75rem;font-weight:500">${th.criticalAutoStop ? 'Enabled' : 'Disabled'}</span></label>
+              <p style="font-size:0.625rem;color:var(--text-400);margin-top:0.25rem">Auto-end session on critical</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="accordion-header-left">
+            <div class="accordion-icon" style="background:rgba(249,115,22,0.1);color:#f97316"><span class="material-symbols-outlined">gavel</span></div>
+            <div><h3 style="font-weight:700">Consequence Scripts</h3><p style="font-size:0.75rem;color:var(--text-500)">Edit the action, script, and restorative steps for each severity level</p></div>
+          </div>
+          <span class="material-symbols-outlined" style="color:var(--text-400)">expand_more</span>
+        </div>
+        <div class="accordion-body">
+          <div class="space-y-6">
+            ${[1, 2, 3, 4].map(sev => {
+      const c = band.consequences[sev];
+      if (!c) return '';
+      return `
+              <div style="border:1px solid var(--text-100);border-radius:var(--radius-xl);padding:1.25rem;border-left:4px solid ${sevColors[sev]}">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                  <h4 style="font-size:0.875rem;font-weight:700;display:flex;align-items:center;gap:0.5rem">
+                    <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:${sevColors[sev]}"></span>
+                    ${sevLabels[sev]}
+                  </h4>
+                  ${c.parentEscalation ? '<span class="badge badge-warning" style="font-size:0.625rem">Parent Escalation</span>' : ''}
                 </div>
                 <div class="space-y-4">
-                  <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer"><span style="font-size:0.75rem;color:var(--text-600)">Detection Enabled</span><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></label>
-                  <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer"><span style="font-size:0.75rem;color:var(--text-600)">Auto-escalation</span><label class="toggle"><input type="checkbox" ${i === 0 ? 'checked' : ''}><span class="toggle-track"></span></label></label>
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label" style="font-size:0.75rem">Action Label</label>
+                    <input type="text" class="form-input" id="meth-action-${bandKey}-${sev}" value="${Utils.escapeHtml(c.action)}" style="font-size:0.875rem">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label" style="font-size:0.75rem">Script (use [name] as placeholder)</label>
+                    <textarea class="form-textarea" id="meth-script-${bandKey}-${sev}" rows="2" style="font-size:0.875rem">${Utils.escapeHtml(c.script)}</textarea>
+                  </div>
+                  <div class="grid-2">
+                    <div class="form-group" style="margin-bottom:0">
+                      <label class="form-label" style="font-size:0.75rem">Restorative Step</label>
+                      <input type="text" class="form-input" id="meth-restor-${bandKey}-${sev}" value="${Utils.escapeHtml(c.restorative)}" style="font-size:0.875rem">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                      <label class="form-label" style="font-size:0.75rem">Parent Escalation</label>
+                      <label class="toggle" style="margin-top:0.25rem"><input type="checkbox" id="meth-parent-${bandKey}-${sev}" ${c.parentEscalation ? 'checked' : ''}><span class="toggle-track"></span><span style="margin-left:0.5rem;font-size:0.75rem">${c.parentEscalation ? 'Yes' : 'No'}</span></label>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+    }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="accordion-header-left">
+            <div class="accordion-icon" style="background:rgba(239,68,68,0.1);color:#ef4444"><span class="material-symbols-outlined">category</span></div>
+            <div><h3 style="font-weight:700">Behavioral Categories</h3><p style="font-size:0.75rem;color:var(--text-500)">8 categories are defined globally and used across all bands</p></div>
+          </div>
+          <span class="material-symbols-outlined" style="color:var(--text-400)">expand_more</span>
+        </div>
+        <div class="accordion-body collapsed">
+          <div class="grid-2">
+            ${Methodology.getAllCategories().map(cat => `
+              <div style="padding:0.75rem 1rem;border-radius:var(--radius);border:1px solid var(--text-100);display:flex;align-items:center;gap:0.75rem">
+                <span class="material-symbols-outlined" style="color:${cat.color};font-size:1.25rem">${cat.icon}</span>
+                <div>
+                  <p style="font-size:0.875rem;font-weight:600">${cat.label}</p>
+                  <p style="font-size:0.75rem;color:var(--text-500)">${cat.desc}</p>
                 </div>
               </div>
             `).join('')}
           </div>
         </div>
       </div>
-
-      <div class="accordion">
-        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
-          <div class="accordion-header-left">
-            <div class="accordion-icon" style="background:rgba(239,68,68,0.1);color:#ef4444"><span class="material-symbols-outlined">warning</span></div>
-            <div><h3 style="font-weight:700">Session Consequences</h3><p style="font-size:0.75rem;color:var(--text-500)">Automation rules for session termination and reporting</p></div>
-          </div>
-          <span class="material-symbols-outlined" style="color:var(--text-400)">expand_less</span>
-        </div>
-        <div class="accordion-body">
-          <div class="space-y-6">
-            <div style="display:flex;align-items:flex-start;gap:1.5rem;padding:1rem;border:1px solid var(--text-100);border-radius:var(--radius-xl)">
-              <div style="flex:1"><h4 style="font-size:0.875rem;font-weight:700;margin-bottom:0.25rem">Critical Violation Logic</h4><p style="font-size:0.75rem;color:var(--text-500)">Immediately flag and terminate session if 3 minor or 1 major violation occurs within 5 minutes.</p></div>
-              <label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label>
-            </div>
-            <div class="grid-3">
-              <div class="config-box">
-                <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">timer</span><span class="config-box-label">Cooldown</span></div>
-                <select class="form-select"><option>15 Minutes</option><option>30 Minutes</option><option>60 Minutes</option></select>
-              </div>
-              <div class="config-box">
-                <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">mail</span><span class="config-box-label">Auto-Reporting</span></div>
-                <div style="display:flex;gap:1rem"><label class="checkbox-group"><input type="checkbox" checked><span style="font-size:0.75rem">Admin</span></label><label class="checkbox-group"><input type="checkbox"><span style="font-size:0.75rem">Instructor</span></label></div>
-              </div>
-              <div class="config-box">
-                <div class="config-box-header"><span class="material-symbols-outlined" style="font-size:0.875rem;color:var(--text-400)">lock</span><span class="config-box-label">Lockout Mode</span></div>
-                <label class="toggle" style="margin-top:0.5rem"><input type="checkbox" checked><span class="toggle-track"></span><span style="margin-left:0.75rem;font-size:0.75rem;font-weight:500">Enabled</span></label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="accordion">
-        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('collapsed')">
-          <div class="accordion-header-left">
-            <div class="accordion-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6"><span class="material-symbols-outlined">analytics</span></div>
-            <div><h3 style="font-weight:700">Advanced Calculations</h3><p style="font-size:0.75rem;color:var(--text-500)">Parameter adjustments for final score generation</p></div>
-          </div>
-          <span class="material-symbols-outlined" style="color:var(--text-400)">expand_more</span>
-        </div>
-        <div class="accordion-body collapsed"></div>
-      </div>
     `;
   }
 
   function _switchMethodologyTab(btn) {
+    // Save current band edits to memory before switching
+    _collectBandEdits(_activeBand);
+
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    showToast('Grade band switched');
+    _activeBand = btn.dataset.band;
+
+    const sectionsEl = document.getElementById('methodology-sections');
+    if (sectionsEl && _editableConfig) {
+      sectionsEl.innerHTML = _renderMethodologySections(_editableConfig.bands[_activeBand], _activeBand);
+    }
+    // Update preview text
+    const previewEl = document.getElementById('methodology-preview-text');
+    if (previewEl && _editableConfig) {
+      const b = _editableConfig.bands[_activeBand];
+      previewEl.innerHTML = `Based on current settings for <strong>${b.label}</strong>: Warning at <strong>${b.thresholds.warningCount}</strong> incidents, escalation at <strong>${b.thresholds.escalateCount}</strong>. Critical auto-stop is <strong>${b.thresholds.criticalAutoStop ? 'enabled' : 'disabled'}</strong>.`;
+    }
+  }
+
+  function _collectBandEdits(bandKey) {
+    if (!_editableConfig || !_editableConfig.bands[bandKey]) return;
+    const band = _editableConfig.bands[bandKey];
+    const wEl = document.getElementById('meth-warning');
+    const eEl = document.getElementById('meth-escalate');
+    const aEl = document.getElementById('meth-autostop');
+    if (wEl) band.thresholds.warningCount = parseInt(wEl.value) || band.thresholds.warningCount;
+    if (eEl) band.thresholds.escalateCount = parseInt(eEl.value) || band.thresholds.escalateCount;
+    if (aEl) band.thresholds.criticalAutoStop = aEl.checked;
+
+    [1, 2, 3, 4].forEach(sev => {
+      const c = band.consequences[sev];
+      if (!c) return;
+      const actEl = document.getElementById(`meth-action-${bandKey}-${sev}`);
+      const scrEl = document.getElementById(`meth-script-${bandKey}-${sev}`);
+      const resEl = document.getElementById(`meth-restor-${bandKey}-${sev}`);
+      const parEl = document.getElementById(`meth-parent-${bandKey}-${sev}`);
+      if (actEl) c.action = actEl.value;
+      if (scrEl) c.script = scrEl.value;
+      if (resEl) c.restorative = resEl.value;
+      if (parEl) c.parentEscalation = parEl.checked;
+    });
+  }
+
+  async function _saveMethodology() {
+    _collectBandEdits(_activeBand);
+    await DB.put('methodology', { id: 'default', config: _editableConfig, updatedAt: Utils.now() });
+    showToast('Methodology configuration saved');
+  }
+
+  async function _resetMethodology() {
+    _editableConfig = Methodology.getDefaultConfig();
+    await DB.put('methodology', { id: 'default', config: _editableConfig, updatedAt: Utils.now() });
+    showToast('Reset to default configuration');
+    navigate('methodology');
   }
 
   // ===================== INCIDENTS VIEW =====================
@@ -758,14 +844,58 @@ const App = (() => {
     const model = (await DB.get('preferences', 'aiModel'))?.value || 'deepseek-chat';
     const sysPrompt = (await DB.get('preferences', 'systemPrompt'))?.value || '';
     const anonymize = (await DB.get('preferences', 'dataAnonymization'))?.value ?? true;
+    // Refresh student list
+    _students = await DB.getAll('students');
 
     container.innerHTML = `
       <div class="page-header mb-8">
         <h1>Settings</h1>
-        <p style="font-size:1.125rem">Manage your AI configuration, system endpoints, and overall data preferences.</p>
+        <p style="font-size:1.125rem">Manage students, AI configuration, system endpoints, and data preferences.</p>
       </div>
 
       <div class="space-y-8" style="max-width:56rem;margin:0 auto">
+
+        <!-- Student Management -->
+        <section class="settings-section">
+          <div class="settings-section-header">
+            <span class="material-symbols-outlined text-primary">group</span>
+            <h2>Student Management</h2>
+          </div>
+
+          <!-- Add Student Form -->
+          <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap">
+            <input type="text" class="form-input" id="new-student-name" placeholder="Student name" style="flex:1;min-width:12rem">
+            <input type="number" class="form-input" id="new-student-grade" placeholder="Grade" min="1" max="13" style="width:5rem">
+            <button class="btn btn-primary" onclick="App._addStudent()" style="white-space:nowrap">
+              <span class="material-symbols-outlined" style="font-size:1rem">person_add</span> Add Student
+            </button>
+          </div>
+
+          <!-- Student List -->
+          <div class="space-y-4" id="student-list">
+            ${_students.length === 0 ? '<p class="text-muted" style="text-align:center;padding:1rem">No students yet — add one above.</p>' : ''}
+            ${_students.map(s => `
+              <div class="setting-row" style="align-items:center;gap:1rem" id="student-row-${s.id}">
+                <div style="display:flex;align-items:center;gap:0.75rem;flex:1">
+                  <div class="avatar-circle" style="width:2.5rem;height:2.5rem;font-size:0.75rem;flex-shrink:0">${Utils.initials(s.name)}</div>
+                  <div style="flex:1">
+                    <p style="font-weight:600;font-size:0.875rem">${Utils.escapeHtml(s.name)}</p>
+                    <p style="font-size:0.75rem;color:var(--text-500)">Grade ${s.grade} · ${s.streak || 0} day streak · ${s.points || 0} points</p>
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.5rem">
+                  <button class="icon-btn" title="Edit" onclick="App._editStudentInline('${s.id}')">
+                    <span class="material-symbols-outlined" style="font-size:1.125rem">edit</span>
+                  </button>
+                  <button class="icon-btn" title="Delete" onclick="App._deleteStudent('${s.id}')" style="color:var(--rose)">
+                    <span class="material-symbols-outlined" style="font-size:1.125rem">delete</span>
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
         <!-- AI Configuration -->
         <section class="settings-section">
           <div class="settings-section-header">
@@ -886,13 +1016,89 @@ const App = (() => {
     navigate(_page);
   }
 
+  // ===================== STUDENT MANAGEMENT =====================
+
+  async function _addStudent() {
+    const nameEl = document.getElementById('new-student-name');
+    const gradeEl = document.getElementById('new-student-grade');
+    const name = nameEl?.value?.trim();
+    const grade = parseInt(gradeEl?.value);
+    if (!name) { showToast('Enter a student name', 'error'); return; }
+    if (!grade || grade < 1 || grade > 13) { showToast('Enter a valid grade (1–13)', 'error'); return; }
+
+    const student = { id: Utils.generateId(), name, grade, streak: 0, points: 0, createdAt: Utils.now() };
+    await DB.add('students', student);
+    _students = await DB.getAll('students');
+    if (!_selectedStudent) _selectedStudent = student;
+    _populateStudentSelector();
+    showToast(`${name} added`);
+    navigate('settings');
+  }
+
+  async function _deleteStudent(studentId) {
+    const student = _students.find(s => s.id === studentId);
+    if (!student) return;
+    const confirmed = confirm(`Delete ${student.name}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    await DB.remove('students', studentId);
+    _students = await DB.getAll('students');
+    if (_selectedStudent?.id === studentId) {
+      _selectedStudent = _students[0] || null;
+    }
+    _populateStudentSelector();
+    showToast(`${student.name} removed`);
+    navigate('settings');
+  }
+
+  async function _editStudentInline(studentId) {
+    const row = document.getElementById(`student-row-${studentId}`);
+    const student = _students.find(s => s.id === studentId);
+    if (!row || !student) return;
+
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.5rem;flex:1;flex-wrap:wrap">
+        <input type="text" class="form-input" id="edit-name-${studentId}" value="${Utils.escapeHtml(student.name)}" style="flex:1;min-width:10rem">
+        <input type="number" class="form-input" id="edit-grade-${studentId}" value="${student.grade}" min="1" max="13" style="width:5rem">
+        <input type="number" class="form-input" id="edit-points-${studentId}" value="${student.points || 0}" min="0" style="width:5rem" placeholder="Points">
+      </div>
+      <div style="display:flex;gap:0.5rem">
+        <button class="btn btn-primary" onclick="App._saveStudentEdit('${studentId}')" style="font-size:0.75rem;padding:0.375rem 0.75rem">Save</button>
+        <button class="btn" onclick="App.navigate('settings')" style="font-size:0.75rem;padding:0.375rem 0.75rem;color:var(--text-500)">Cancel</button>
+      </div>
+    `;
+    document.getElementById(`edit-name-${studentId}`)?.focus();
+  }
+
+  async function _saveStudentEdit(studentId) {
+    const student = _students.find(s => s.id === studentId);
+    if (!student) return;
+    const name = document.getElementById(`edit-name-${studentId}`)?.value?.trim();
+    const grade = parseInt(document.getElementById(`edit-grade-${studentId}`)?.value);
+    const points = parseInt(document.getElementById(`edit-points-${studentId}`)?.value) || 0;
+    if (!name) { showToast('Name cannot be empty', 'error'); return; }
+    if (!grade || grade < 1 || grade > 13) { showToast('Grade must be 1–13', 'error'); return; }
+
+    student.name = name;
+    student.grade = grade;
+    student.points = points;
+    await DB.put('students', student);
+    _students = await DB.getAll('students');
+    if (_selectedStudent?.id === studentId) _selectedStudent = student;
+    _populateStudentSelector();
+    showToast(`${name} updated`);
+    navigate('settings');
+  }
+
   // Public API
   return {
     init, navigate, currentPage, showToast,
     _quickLog, _openIncidentModal, _closeIncidentModal, _submitIncident,
     _applyAction, _toggleGoal, _filterIncidents, _goToIncidentPage,
-    _switchMethodologyTab, _saveSettings, _testConnection,
-    _changeStudentAndRefresh, _renderIncidents
+    _switchMethodologyTab, _saveMethodology, _resetMethodology,
+    _saveSettings, _testConnection,
+    _changeStudentAndRefresh, _renderIncidents,
+    _addStudent, _deleteStudent, _editStudentInline, _saveStudentEdit
   };
 })();
 
