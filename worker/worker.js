@@ -44,6 +44,7 @@ const ALLOWED_ORIGINS = [
 function isAllowedOrigin(origin) {
     if (!origin) return true; // Allow requests without origin (e.g., server-side)
     if (origin === 'null') return true; // file:// protocol sends origin "null"
+    if (origin.endsWith('.github.io')) return true; // GitHub Pages
     return ALLOWED_ORIGINS.some(allowed => origin.startsWith(allowed));
 }
 
