@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Order OS — Tutoring Discipline Management</title>
+    <meta name="description"
+        content="Session Order OS helps tutors maintain order during tutoring sessions with AI-assisted incident analysis and grade-appropriate discipline workflows.">
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <span class="material-symbols-outlined">shield_person</span>
+                </div>
+                <h1 class="logo-text">SESSION ORDER OS</h1>
+            </div>
+            <div class="header-divider"></div>
+            <div class="student-selector">
+                <div class="student-avatar-sm">
+                    <span class="material-symbols-outlined" style="font-size:0.875rem">person</span>
+                </div>
+                <select id="student-select" class="student-select"></select>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="session-timer" id="session-timer">
+                <span class="material-symbols-outlined text-primary" style="font-size:1.25rem">timer</span>
+                <span id="session-timer-value">00:00</span>
+            </div>
+            <button class="icon-btn" id="btn-session-toggle" title="Start/Stop Session">
+                <span class="material-symbols-outlined">play_circle</span>
+            </button>
+            <button class="icon-btn" id="btn-theme" title="Toggle Theme">
+                <span class="material-symbols-outlined">palette</span>
+            </button>
+            <button class="icon-btn" id="btn-settings" title="Settings">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+            <div class="avatar-circle" title="Teacher Profile">T</div>
+        </div>
+    </header>
+
+    <!-- ============ APP SHELL ============ -->
+    <div class="app-shell">
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <p class="sidebar-label">Navigation</p>
+            <nav class="sidebar-nav">
+                <a href="#session" class="nav-item active" data-page="session">
+                    <span class="material-symbols-outlined">play_circle</span>
+                    <span>Session</span>
+                </a>
+                <a href="#rules" class="nav-item" data-page="rules">
+                    <span class="material-symbols-outlined">rule</span>
+                    <span>Rules</span>
+                </a>
+                <a href="#methodology" class="nav-item" data-page="methodology">
+                    <span class="material-symbols-outlined">science</span>
+                    <span>Methodology</span>
+                </a>
+                <a href="#incidents" class="nav-item" data-page="incidents">
+                    <span class="material-symbols-outlined">report_problem</span>
+                    <span>Incidents</span>
+                </a>
+                <a href="#reports" class="nav-item" data-page="reports">
+                    <span class="material-symbols-outlined">assessment</span>
+                    <span>Reports</span>
+                </a>
+                <a href="#settings" class="nav-item" data-page="settings">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer Status -->
+            <div class="sidebar-status">
+                <p class="sidebar-status-label">Class Status</p>
+                <div class="sidebar-status-row">
+                    <span id="session-state-label" class="sidebar-status-value">Stable</span>
+                    <div class="status-dots">
+                        <div class="status-dot session-state-dot"></div>
+                        <div class="status-dot session-state-dot"></div>
+                        <div class="status-dot session-state-dot inactive"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Rendered dynamically by app.js -->
+        </main>
+    </div>
+
+    <!-- ============ INCIDENT LOGGING MODAL ============ -->
+    <div id="incident-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem">
+                    <span class="material-symbols-outlined text-primary" style="font-size:1.5rem">report_problem</span>
+                    <h2>Log Incident</h2>
+                </div>
+                <p class="modal-subtitle">SESSION ORDER OS • System Monitor</p>
+            </div>
+
+            <div class="modal-body">
+                <!-- Category -->
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="modal-category" class="form-select">
+                        <option disabled selected value="">Select behavior category</option>
+                        <option value="FOCUS_OFF_TASK">Off-Task</option>
+                        <option value="INTERRUPTING">Interrupting</option>
+                        <option value="DISRESPECT_TONE">Disrespect / Tone</option>
+                        <option value="NON_COMPLIANCE">Non-Compliance</option>
+                        <option value="TECH_MISUSE">Device Misuse</option>
+                        <option value="ACADEMIC_INTEGRITY">Academic Integrity</option>
+                        <option value="SAFETY_BOUNDARY">Safety Boundary</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+
+                <!-- Severity -->
+                <div class="form-group">
+                    <label class="form-label">Severity Level</label>
+                    <div class="severity-group">
+                        <div class="severity-option">
+                            <input type="radio" name="modal-severity" id="sev-1" value="1" checked>
+                            <label for="sev-1">Low</label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" name="modal-severity" id="sev-2" value="2">
+                            <label for="sev-2">Medium</label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" name="modal-severity" id="sev-3" value="3">
+                            <label for="sev-3">High</label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" name="modal-severity" id="sev-4" value="4">
+                            <label for="sev-4">Critical</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label">Short Description</label>
+                    <input type="text" id="modal-description" class="form-input"
+                        placeholder="e.g., Student was browsing YouTube during lesson">
+                </div>
+
+                <!-- Context -->
+                <div class="form-group">
+                    <div class="form-label-row">
+                        <label class="form-label">Additional Context</label>
+                        <span class="form-optional">Optional</span>
+                    </div>
+                    <textarea id="modal-context" class="form-textarea"
+                        placeholder="Provide details about what happened, triggers, or other context..."
+                        rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" style="color:var(--text-600);font-weight:600"
+                    onclick="App._closeIncidentModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="App._submitIncident()">Log Incident</button>
+            </div>
+
+            <button class="modal-close" onclick="App._closeIncidentModal()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ============ SCRIPTS ============ -->
+    <script src="utils.js"></script>
+    <script src="validate.js"></script>
+    <script src="methodology.js"></script>
+    <script src="db.js"></script>
+    <script src="session.js"></script>
+    <script src="incidents.js"></script>
+    <script src="ai.js"></script>
+    <script src="export.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>

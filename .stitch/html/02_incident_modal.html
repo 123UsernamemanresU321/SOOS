@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Incident Logging - SESSION ORDER OS</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased">
+<!-- Dashboard Background Simulation (for context) -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+<div class="absolute top-10 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-10 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="p-8 space-y-6">
+<div class="h-10 w-48 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+<div class="grid grid-cols-3 gap-6">
+<div class="h-32 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+<div class="h-32 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+<div class="h-32 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+</div>
+<div class="h-96 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+<!-- Glassmorphic Card Container -->
+<div class="relative w-full max-w-[560px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl rounded-xl overflow-hidden">
+<!-- Modal Header -->
+<div class="px-8 pt-8 pb-4">
+<div class="flex items-center gap-3 mb-1">
+<span class="material-symbols-outlined text-primary text-2xl">report_problem</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-2xl font-bold tracking-tight">Log Incident</h2>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">SESSION ORDER OS • System Monitor</p>
+</div>
+<!-- Form Content -->
+<form class="px-8 py-4 space-y-6">
+<!-- Category Selector -->
+<div class="space-y-2">
+<label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold">Category</label>
+<div class="relative group">
+<select class="appearance-none w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none">
+<option disabled="" selected="" value="">Select system category</option>
+<option value="ui">User Interface Error</option>
+<option value="backend">Backend Service Failure</option>
+<option value="database">Database Connection</option>
+<option value="network">Network Timeout</option>
+</select>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Severity Selector (Radio Buttons) -->
+<div class="space-y-3">
+<label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold">Severity Level</label>
+<div class="flex p-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-lg gap-1">
+<label class="relative flex-1 group cursor-pointer">
+<input checked="" class="peer absolute opacity-0" name="severity" type="radio" value="low"/>
+<div class="flex items-center justify-center py-2 rounded-md transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:shadow-sm text-slate-500 dark:text-slate-400 peer-checked:text-slate-900 dark:peer-checked:text-white hover:text-slate-700">
+<span class="text-sm font-medium">Low</span>
+</div>
+</label>
+<label class="relative flex-1 group cursor-pointer">
+<input class="peer absolute opacity-0" name="severity" type="radio" value="medium"/>
+<div class="flex items-center justify-center py-2 rounded-md transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:shadow-sm text-slate-500 dark:text-slate-400 peer-checked:text-slate-900 dark:peer-checked:text-white hover:text-slate-700">
+<span class="text-sm font-medium">Medium</span>
+</div>
+</label>
+<label class="relative flex-1 group cursor-pointer">
+<input class="peer absolute opacity-0" name="severity" type="radio" value="high"/>
+<div class="flex items-center justify-center py-2 rounded-md transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:shadow-sm text-slate-500 dark:text-slate-400 peer-checked:text-slate-900 dark:peer-checked:text-white hover:text-slate-700">
+<span class="text-sm font-medium">High</span>
+</div>
+</label>
+<label class="relative flex-1 group cursor-pointer">
+<input class="peer absolute opacity-0" name="severity" type="radio" value="critical"/>
+<div class="flex items-center justify-center py-2 rounded-md transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:shadow-sm text-slate-500 dark:text-slate-400 peer-checked:text-slate-900 dark:peer-checked:text-white hover:text-slate-700">
+<span class="text-sm font-medium">Critical</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Description Input -->
+<div class="space-y-2">
+<label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold">Short Description</label>
+<input class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="e.g., Session timeout on checkout page" type="text"/>
+</div>
+<!-- Context (Optional Textarea) -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block text-slate-700 dark:text-slate-300 text-sm font-semibold">Additional Context</label>
+<span class="text-xs text-slate-400 font-medium">Optional</span>
+</div>
+<textarea class="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none resize-none" placeholder="Provide technical details or steps to reproduce..." rows="3"></textarea>
+</div>
+</form>
+<!-- Modal Footer Buttons -->
+<div class="px-8 py-6 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+<button class="px-6 py-2.5 rounded-lg text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                    Cancel
+                </button>
+<button class="px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-95">
+                    Log Incident
+                </button>
+</div>
+<!-- Close Button (Top Right) -->
+<button class="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+</body></html>

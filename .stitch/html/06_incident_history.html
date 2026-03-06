@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Incident History - SESSION ORDER OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 glass-panel border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">layers</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight">SESSION ORDER OS</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Components</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Styles</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Layout</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Docs</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-64 bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20" placeholder="Search incidents..." type="text"/>
+</div>
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-900 overflow-hidden">
+<img alt="User Avatar" data-alt="User profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5JqRmXkIG4GSPT5yx6YgnguiaMqgW5rY0etulhfDiKugYTIe7IoIMAMzphvzr8b9MRBes47HSmQrtPjq4_aUF6uPqMMZzNaho1SFTZrguxTEgoqg3T5yOSHYHRJQvjDOxqw2DD3X9sBZet__aEMEZiY9GQUG5PvHdhEzcsY1Q6n5pOkUGcxBYQmiFcjsBTsbABVC054bbmd50hewoLHxc3Kmb9k-Hg6JULtPzT-JPLo2g94MTQ5bS7yoopDiucAM1RCazCpEqeA"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 max-w-[1440px] mx-auto w-full px-4 py-8 gap-8">
+<aside class="w-64 hidden lg:flex flex-col gap-6">
+<div class="flex items-center gap-3 px-2 mb-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Admin Panel</h3>
+<p class="text-xs text-slate-500 font-medium">v2.4.0 Stable</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20 transition-all" href="#">
+<span class="material-symbols-outlined text-xl">warning</span>
+<span class="text-sm font-semibold">Incidents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="text-sm font-semibold">Logs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-semibold">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined text-xl">help_center</span>
+<span class="text-sm font-semibold">Help &amp; Support</span>
+</a>
+</nav>
+<div class="mt-auto glass-panel p-4 rounded-xl border border-primary/10">
+<p class="text-xs font-bold text-primary mb-2">SYSTEM STATUS</p>
+<div class="flex items-center gap-2">
+<div class="size-2 bg-emerald-500 rounded-full animate-pulse"></div>
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-300">All systems operational</span>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col gap-6">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Incident History</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-2 font-medium">Real-time monitoring and historical activity logs.</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+                            Export
+                        </button>
+</div>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<button class="shrink-0 px-4 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-xs font-bold transition-colors">All Severities</button>
+<button class="shrink-0 px-4 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Critical</button>
+<button class="shrink-0 px-4 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Warning</button>
+<button class="shrink-0 px-4 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Info</button>
+<button class="shrink-0 px-4 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Maintenance</button>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="glass-panel group flex flex-col md:flex-row rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="md:w-64 h-48 md:h-auto bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+<img alt="Infrastructure" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Modern server room hardware close-up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAzes_kErn2niGFfljtxe4X2hZlaKGCJgQ-0PzmAVNDqLv8SN89-NsEEFfmFpamqZD1jHrC93yrhRT7EgBxw_R_b0uiT1wBIptGl3w_T-KDSkaxLj3Kzf_qxJHydIjDQpsES1qLbhdqY1NIfhemGcQzEMJFxc7qonaUNkJb1rYKVbH76Fn-gX3dLGOjeYdLKIDmcNvn4H1FQcK9wkuHHU7X9uuk0hkQDe9X2o263z-WcjzFUUU_EszGvUwvvewwC1wogxGYt1Zlg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-end items-end p-4 md:hidden">
+<span class="text-white text-xs font-bold tracking-widest uppercase">Infrastructure</span>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="hidden md:block text-[10px] font-black text-primary tracking-widest uppercase">Infrastructure</span>
+<span class="text-xs text-slate-500 font-medium">Oct 24, 2023 • 14:30:05</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Database Connection Timeout</h3>
+<p class="mt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    Primary database cluster 'DB-PROD-01' failed to respond to heartbeat signals. Connection pools reached 95% capacity leading to request queuing.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-black rounded-full uppercase tracking-wider">Critical</span>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-wider">Resolved</span>
+</div>
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 transition-all">
+                                    View Details
+                                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-panel group flex flex-col md:flex-row rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="md:w-64 h-48 md:h-auto bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+<img alt="Application" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Abstract digital user interface dashboard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEvHD53vUEVxzSwFZjwuingx7Wbkzk7TOv-bZ4xjajNvZiyM_Ka4J1eQulYQ0uDiU5dXXqJdAMloOCSAkhQKsyJ_Y37oQ0ClRxbXYYch5RL8rYyjE2F71z2SlpGSX_PVTE6ZK9E-UNnRk-pK-tLsjRscE5hLpqclCV7Ey_t3edDJCKxfBcGmW3y4NZipquJ9uRpfylMh1gw5gnR0rNeUlmsEBIsrXIY9W_9pTj9kIkIWDnWQa25QxaYrCfm97EK4Pd0jqnLYbjhA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-end items-end p-4 md:hidden">
+<span class="text-white text-xs font-bold tracking-widest uppercase">Application</span>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="hidden md:block text-[10px] font-black text-amber-600 tracking-widest uppercase">Application</span>
+<span class="text-xs text-slate-500 font-medium">Oct 23, 2023 • 09:12:44</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">API Rate Limit Threshold</h3>
+<p class="mt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    Public API gateway observed a 40% surge in traffic from unauthenticated endpoints. Automated throttling was engaged for non-premium consumers.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-black rounded-full uppercase tracking-wider">Warning</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-black rounded-full uppercase tracking-wider">Archived</span>
+</div>
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 transition-all">
+                                    View Details
+                                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-panel group flex flex-col md:flex-row rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
+<div class="md:w-64 h-48 md:h-auto bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+<img alt="Security" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Security code on a computer screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDENIxjxeO-kCpN5CTmYVhV4z_rt9-lzmPyAzqVlWkQL6r8Fr2VHQuAAOMKaEI3jD0uUZ_K4FqKKlqzPc4MKyLv53mAxVoixZbrRbBMOU1xqu8RFcmwr9URsZTwOVJyiODfrtEnpJrm4gTsa0BLbsENWpLd44wEcpVHTAHMmqDwLyIKb8sMGYd5qNEUjlmaPxYT9fdG12UNY_EMtGTd84ZJjyquDwoM736AWGTCRUgW8-42A9TL2E-y0snOmphgrX-YBrGo7EAZtw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-end items-end p-4 md:hidden">
+<span class="text-white text-xs font-bold tracking-widest uppercase">Security</span>
+</div>
+</div>
+<div class="flex-1 p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="hidden md:block text-[10px] font-black text-emerald-600 tracking-widest uppercase">Security</span>
+<span class="text-xs text-slate-500 font-medium">Oct 22, 2023 • 23:55:10</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">SSL Certificate Rotation</h3>
+<p class="mt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                                    Scheduled maintenance: All edge certificates were successfully rotated. No downtime was observed during the transition.
+                                </p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-full uppercase tracking-wider">Info</span>
+<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-black rounded-full uppercase tracking-wider">Completed</span>
+</div>
+<button class="flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 transition-all">
+                                    View Details
+                                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center gap-2 mt-4">
+<button class="size-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="size-10 flex items-center justify-center rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20">1</button>
+<button class="size-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary transition-all">2</button>
+<button class="size-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary transition-all">3</button>
+<button class="size-10 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+<footer class="border-t border-slate-200 dark:border-slate-800 mt-12 py-8 bg-white dark:bg-slate-900">
+<div class="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-xl">copyright</span>
+<p class="text-sm font-medium">2024 Session Order OS. All rights reserved.</p>
+</div>
+<div class="flex items-center gap-8">
+<a class="text-xs font-bold text-slate-500 hover:text-primary uppercase tracking-widest" href="#">Privacy Policy</a>
+<a class="text-xs font-bold text-slate-500 hover:text-primary uppercase tracking-widest" href="#">System Status</a>
+<a class="text-xs font-bold text-slate-500 hover:text-primary uppercase tracking-widest" href="#">Cloud API</a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

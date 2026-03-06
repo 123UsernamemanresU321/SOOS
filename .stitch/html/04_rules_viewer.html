@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rules Viewer - SESSION ORDER OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(16, 22, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+<div class="p-6 flex items-center gap-3">
+<div class="p-2 bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined block">grid_view</span>
+</div>
+<h2 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white uppercase">Session OS</h2>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<div class="py-4">
+<p class="px-3 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Management</p>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+                        Dashboard
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-lg bg-primary/10 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">gavel</span>
+                        Rules
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+                        Students
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">schedule</span>
+                        Sessions
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">description</span>
+                        Reports
+                    </a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Alex Rivera</p>
+<p class="text-xs text-slate-500 truncate">Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Top Header -->
+<header class="h-16 flex items-center justify-between px-8 border-b border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl z-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-6">
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Components</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Styles</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Layout</a>
+<a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Docs</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<!-- Session Timer -->
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-sm text-primary animate-pulse">timer</span>
+<span class="text-sm font-mono font-bold text-slate-700 dark:text-slate-300">45:22</span>
+</div>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+<div class="flex gap-2">
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+<!-- Content Header -->
+<div class="flex flex-wrap items-end justify-between gap-6 mb-10">
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-primary font-semibold text-sm tracking-wide uppercase">
+<span class="material-symbols-outlined text-base">verified</span>
+<span>Active Guidelines</span>
+</div>
+<h1 class="text-5xl font-black tracking-tight text-slate-900 dark:text-white">Grade 8 Rules</h1>
+<p class="text-lg text-slate-500 dark:text-slate-400 max-w-2xl">Standard operating procedures and behavioral expectations for the current academic session.</p>
+</div>
+<div class="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="px-4 py-2 flex flex-col">
+<span class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Selected Student</span>
+<select class="bg-transparent border-none p-0 text-sm font-bold focus:ring-0 text-slate-900 dark:text-white">
+<option>Marcus Thompson</option>
+<option>Elena Rodriguez</option>
+<option>James Wilson</option>
+</select>
+</div>
+<button class="bg-primary text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all active:scale-95">
+                            Edit Rules
+                        </button>
+</div>
+</div>
+<!-- Rules Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- Rule Card 1 -->
+<div class="glass p-6 rounded-xl flex flex-col gap-4 group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="h-12 w-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-3xl">verified_user</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Behavioral Standards</h3>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Respect peer boundaries and maintain professional conduct at all times within the session.</p>
+</div>
+</div>
+<!-- Rule Card 2 -->
+<div class="glass p-6 rounded-xl flex flex-col gap-4 group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="h-12 w-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-3xl">menu_book</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Academic Integrity</h3>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">All work must be original and cited according to OS standards. Plagiarism results in immediate disqualification.</p>
+</div>
+</div>
+<!-- Rule Card 3 -->
+<div class="glass p-6 rounded-xl flex flex-col gap-4 group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="h-12 w-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-3xl">update</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Session Procedures</h3>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Check-in is required within 5 minutes of session start. Late arrivals must report to administration.</p>
+</div>
+</div>
+<!-- Rule Card 4 -->
+<div class="glass p-6 rounded-xl flex flex-col gap-4 group hover:shadow-xl hover:shadow-primary/5 transition-all">
+<div class="h-12 w-12 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-3xl">emergency_home</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Safety Protocols</h3>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Follow all emergency exit and equipment handling rules. Safety gear is mandatory for lab sessions.</p>
+</div>
+</div>
+</div>
+<!-- Featured Core Rule -->
+<div class="relative overflow-hidden glass rounded-2xl p-0 flex flex-col lg:flex-row min-h-[320px] shadow-lg border-2 border-primary/10">
+<div class="lg:w-1/3 bg-slate-900 overflow-hidden relative min-h-[200px] lg:min-h-full">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-indigo-900/60 z-10"></div>
+<img alt="Student focused in a modern learning environment" class="absolute inset-0 w-full h-full object-cover" data-alt="Focused student in a bright modern classroom" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbSRkyf0HQv3Dni4vIRNazHIUgxpIqyOWPCaHPB5DH0bQpZQRCUUy22UBzeJ-XP8FZkuExUVnJ2OsQaBNXpifHSvDoBQi6e7PJcK1gC2hylFTSfK-6LaYhbsUa8WSukroZgA3ynbvmuYGMVuZqBrDwldtIpVvDJHFO5_0rmzYimfDS_xFeEcYjl8ABjK6VTPL0Anys5OZoeqEIoOPcXVBo8vtBIWXYcLIj-XtqBAiNmr36OIq0VTCkjzp7MnF14I4svyUrWVMXdg"/>
+<div class="absolute bottom-6 left-6 z-20">
+<div class="bg-white/20 backdrop-blur-md border border-white/30 rounded-lg px-3 py-1 text-white text-xs font-bold tracking-widest uppercase">
+                                Grade 8 Core
+                            </div>
+</div>
+</div>
+<div class="lg:w-2/3 p-10 flex flex-col justify-center gap-6">
+<div class="flex items-center gap-3">
+<span class="h-[2px] w-12 bg-primary"></span>
+<span class="text-sm font-black text-primary uppercase tracking-[0.2em]">Mandatory Requirement</span>
+</div>
+<div class="space-y-4">
+<h2 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">Attendance Policy Excellence</h2>
+<p class="text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                                Grade 8 students must maintain a minimum of <span class="text-primary font-bold">95% attendance</span> for session eligibility. Failure to meet this standard will result in restricted access to advanced session modules.
+                            </p>
+</div>
+<div class="flex flex-wrap gap-4 mt-2">
+<div class="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-primary text-xl">event_available</span>
+<span class="text-sm font-semibold">Strict Monitoring</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-primary text-xl">notifications_active</span>
+<span class="text-sm font-semibold">Automatic Alerts</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Quick Actions -->
+<div class="mt-12 flex justify-center">
+<div class="flex items-center gap-8 text-slate-400">
+<div class="flex items-center gap-2 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">print</span>
+<span class="text-sm font-medium">Print Guidelines</span>
+</div>
+<div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
+<div class="flex items-center gap-2 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">share</span>
+<span class="text-sm font-medium">Share Policy</span>
+</div>
+<div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
+<div class="flex items-center gap-2 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">download</span>
+<span class="text-sm font-medium">Export PDF</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
