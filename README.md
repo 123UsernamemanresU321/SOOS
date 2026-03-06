@@ -51,6 +51,17 @@ cd frontend && python3 -m http.server 8080
 
 The app seeds demo data automatically on first load.
 
+### Deploy to GitHub Pages
+
+The repo includes a GitHub Actions workflow at `.github/workflows/deploy.yml` that automatically deploys the `frontend/` directory on every push to `main`.
+
+**Setup:**
+1. Go to your repo → **Settings → Pages**
+2. Under **Source**, select **GitHub Actions**
+3. Push to `main` — the workflow runs automatically
+
+Your app will be live at `https://<username>.github.io/<repo-name>/`.
+
 ### AI Proxy (optional)
 
 See [worker/README.md](worker/README.md) for the complete Cloudflare Worker setup guide.
