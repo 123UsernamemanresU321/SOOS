@@ -610,7 +610,7 @@ const App = (() => {
         `).join('')}
       </div>
 
-      <div style="max-width:64rem" class="space-y-4" id="methodology-sections">
+      <div class="glass" style="max-width:64rem;border-radius:var(--radius-xl);border:1px solid var(--border-light);padding:0" id="methodology-sections">
         ${_renderMethodologySections(_editableConfig.bands[_activeBand], _activeBand)}
       </div>
 
@@ -1147,9 +1147,9 @@ const App = (() => {
         <p style="font-size:1.125rem">Manage students, AI configuration, system endpoints, and data preferences.</p>
       </div>
 
-      <div class="space-y-8" style="max-width:56rem;margin:0 auto">
+      <div style="max-width:56rem;margin:0 auto">
+        <div class="glass" style="border-radius:var(--radius-xl);padding:0 2rem;border:1px solid var(--border-light)">
 
-        <!-- Student Management -->
         <section class="settings-section">
           <div class="settings-section-header">
             <span class="material-symbols-outlined text-primary">group</span>
@@ -1244,17 +1244,13 @@ const App = (() => {
             <span class="material-symbols-outlined text-primary">database</span>
             <h2>Data Export/Import</h2>
           </div>
-          <div class="grid-2">
-            <div style="padding:1rem;border-radius:var(--radius);border:1px solid var(--border-light);display:flex;flex-direction:column;gap:0.75rem">
-              <p style="font-size:0.875rem;font-weight:600">Export Configuration</p>
-              <p style="font-size:0.75rem;color:var(--text-500)">Download a full backup of your current data and settings.</p>
-              <button class="btn btn-outline btn-full" onclick="Export.downloadJSON()" style="margin-top:0.5rem"><span class="material-symbols-outlined" style="font-size:1.125rem">download</span> Download .JSON</button>
-            </div>
-            <div style="padding:1rem;border-radius:var(--radius);border:1px solid var(--border-light);display:flex;flex-direction:column;gap:0.75rem">
-              <p style="font-size:0.875rem;font-weight:600">Import Configuration</p>
-              <p style="font-size:0.75rem;color:var(--text-500)">Restore your environment from a previously exported file.</p>
-              <button class="btn btn-secondary btn-full" onclick="Export.importJSON()" style="margin-top:0.5rem"><span class="material-symbols-outlined" style="font-size:1.125rem">upload</span> Choose File</button>
-            </div>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="Export.downloadJSON()" style="flex:1;min-width:12rem">
+              <span class="material-symbols-outlined" style="font-size:1.125rem">download</span> Download Full Backup (.JSON)
+            </button>
+            <button class="btn btn-secondary" onclick="Export.importJSON()" style="flex:1;min-width:12rem">
+              <span class="material-symbols-outlined" style="font-size:1.125rem">upload</span> Import from File
+            </button>
           </div>
         </section>
 
@@ -1278,7 +1274,7 @@ const App = (() => {
         </section>
 
         <!-- Danger Zone -->
-        <section class="settings-section" style="border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-xl)">
+        <section class="settings-section" style="border-bottom:none;padding-bottom:0">
           <div class="settings-section-header">
             <span class="material-symbols-outlined" style="color:#ef4444">warning</span>
             <h2 style="color:#ef4444">Danger Zone</h2>
@@ -1296,8 +1292,10 @@ const App = (() => {
           </div>
         </section>
 
+        </div>
+
         <!-- Save/Discard -->
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:1rem;padding-bottom:3rem">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:1rem;padding:1.5rem 0 2rem">
           <button class="btn" style="color:var(--text-600)" onclick="navigate('settings')">Discard Changes</button>
           <button class="btn btn-primary" onclick="App._saveSettings()">Save All Changes</button>
         </div>

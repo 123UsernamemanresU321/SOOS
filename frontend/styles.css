@@ -1590,16 +1590,16 @@ img {
 
 /* --- Settings Sections --- */
 .settings-section {
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid var(--border-light);
-  backdrop-filter: blur(4px);
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .dark .settings-section {
-  background: rgba(15, 23, 42, 0.5);
   border-color: var(--border-dark);
+}
+
+.settings-section:last-of-type {
+  border-bottom: none;
 }
 
 .settings-section-header {
@@ -1633,11 +1633,13 @@ img {
 
 /* --- Accordion --- */
 .accordion {
-  background: #fff;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl);
+  background: transparent;
+  border-bottom: 1px solid var(--border-light);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+}
+
+.accordion:last-child {
+  border-bottom: none;
 }
 
 .dark .accordion {
