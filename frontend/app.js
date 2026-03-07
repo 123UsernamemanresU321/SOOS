@@ -363,6 +363,27 @@ const App = (() => {
     const sev = Methodology.getSeverityMeta(analysis?.severity || 1);
     showToast(`Incident logged — ${sev.label}`);
 
+    // Update session state after severity change
+    const session = Session.getCurrent();
+    if (session) {
+      await Session.updateState();
+
+      // Check for critical auto-stop
+      if (session.sessionState === 'critical') {
+        const band = Utils.getGradeBand(session.studentGrade);
+        const config = await DB.get('methodology', 'default');
+        const methodology = config?.config || Methodology.getDefaultConfig();
+        const autoStop = methodology.bands[band]?.thresholds?.criticalAutoStop;
+
+        if (autoStop) {
+          await Session.end();
+          _showCriticalStopOverlay();
+          if (_page === 'session') navigate('session');
+          return; // Stop further execution
+        }
+      }
+    }
+
     if (_page === 'session') navigate('session');
   }
 
@@ -378,11 +399,10 @@ const App = (() => {
     overlay.id = 'analysis-loading';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = `
-      <div style="background:#fff;border-radius:var(--radius-xl);padding:2rem 3rem;text-align:center;box-shadow:var(--shadow-xl);max-width:320px">
-        <div class="analysis-spinner" style="margin:0 auto 1rem"></div>
-        <h3 style="font-weight:700;margin-bottom:0.25rem">Analyzing Incident</h3>
-        <p style="font-size:0.875rem;color:var(--text-500)">${Utils.escapeHtml(label)}</p>
-        <p style="font-size:0.75rem;color:var(--text-400);margin-top:0.5rem">AI is determining severity level…</p>
+      <div style="background:var(--surface);padding:2rem;border-radius:var(--radius-xl);text-align:center;box-shadow:var(--shadow-xl);border:1px solid var(--border-light);max-width:24rem;width:90%">
+        <div class="analysis-spinner"></div>
+        <h3 style="font-size:1.125rem;font-weight:700;margin:1.5rem 0 0.5rem">Analyzing Incident</h3>
+        <p style="color:var(--text-600);font-size:0.875rem">AI is determining severity level for <strong style="color:var(--text-900)">${Utils.escapeHtml(label)}</strong>...</p>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -391,6 +411,25 @@ const App = (() => {
   function _hideAnalysisLoading() {
     const overlay = document.getElementById('analysis-loading');
     if (overlay) overlay.remove();
+  }
+
+  function _showCriticalStopOverlay() {
+    let overlay = document.getElementById('critical-stop-overlay');
+    if (overlay) overlay.remove();
+    overlay = document.createElement('div');
+    overlay.id = 'critical-stop-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(239, 68, 68, 0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s ease forwards';
+    overlay.innerHTML = `
+      <div style="background:#fff;padding:3rem 2rem;border-radius:var(--radius-2xl);text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);max-width:28rem;width:90%">
+        <span class="material-symbols-outlined" style="font-size:4rem;color:#ef4444;margin-bottom:1rem">dangerous</span>
+        <h2 style="font-size:2rem;font-weight:800;color:#0f172a;letter-spacing:-0.05em;margin-bottom:1rem">Session Stopped</h2>
+        <p style="font-size:1.125rem;color:#475569;margin-bottom:2rem;line-height:1.5">
+          A critical incident has occurred. Based on the active methodology configuration, this session has been automatically terminated.
+        </p>
+        <button class="btn" style="background:#ef4444;color:#fff;width:100%;font-size:1.125rem;padding:0.875rem" onclick="document.getElementById('critical-stop-overlay').remove()">Dismiss & Review</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
   }
 
   async function _applyAction() {
