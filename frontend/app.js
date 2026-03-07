@@ -399,7 +399,7 @@ const App = (() => {
     overlay.id = 'analysis-loading';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center';
     overlay.innerHTML = `
-      <div style="background:var(--surface);padding:2rem;border-radius:var(--radius-xl);text-align:center;box-shadow:var(--shadow-xl);border:1px solid var(--border-light);max-width:24rem;width:90%">
+      <div style="background:#fff;padding:2rem;border-radius:var(--radius-xl);text-align:center;box-shadow:var(--shadow-xl);border:1px solid var(--border-light);max-width:24rem;width:90%">
         <div class="analysis-spinner"></div>
         <h3 style="font-size:1.125rem;font-weight:700;margin:1.5rem 0 0.5rem">Analyzing Incident</h3>
         <p style="color:var(--text-600);font-size:0.875rem">AI is determining severity level for <strong style="color:var(--text-900)">${Utils.escapeHtml(label)}</strong>...</p>
