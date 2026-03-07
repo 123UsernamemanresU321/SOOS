@@ -136,9 +136,13 @@ const App = (() => {
     if (startBtn) {
       startBtn.addEventListener('click', async () => {
         if (Session.isActive()) {
-          await Session.end();
+          const endedSession = await Session.end();
           startBtn.querySelector('.material-symbols-outlined').textContent = 'play_circle';
-          showToast('Session ended');
+          // Fetch session incidents for summary
+          if (endedSession) {
+            const sessionIncidents = await DB.getByIndex('incidents', 'sessionId', endedSession.id);
+            _showSessionEndSummary(endedSession, sessionIncidents);
+          }
           navigate('session');
         } else if (_selectedStudent) {
           await Session.start(_selectedStudent.id);
@@ -198,16 +202,25 @@ const App = (() => {
               <span class="material-symbols-outlined text-primary" style="font-size:0.875rem">checklist</span>
               Session Goals
             </h4>
+            ${session ? `
+              <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+                <input type="text" class="form-input" id="goal-input" placeholder="Add a goal…" style="font-size:0.8125rem;padding:0.5rem 0.75rem" onkeydown="if(event.key==='Enter')App._addGoal()">
+                <button class="btn btn-primary btn-sm" onclick="App._addGoal()" style="flex-shrink:0;padding:0.5rem 0.75rem"><span class="material-symbols-outlined" style="font-size:1rem">add</span></button>
+              </div>
+            ` : ''}
             <div class="space-y-4" id="session-goals">
-              ${(session?.goals || [
-        { id: 'g1', text: 'Complete math module', completed: true },
-        { id: 'g2', text: 'Stay in seat during lecture', completed: false },
-        { id: 'g3', text: 'Submit final draft', completed: false }
-      ]).map(g => `
-                <label class="checkbox-group" data-goal="${g.id}">
-                  <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="App._toggleGoal('${g.id}')">
-                  <span style="font-size:0.875rem">${Utils.escapeHtml(g.text)}</span>
-                </label>
+              ${(session?.goals || []).length === 0 && !session ? '<p style="font-size:0.8125rem;color:var(--text-400)">Start a session to add goals</p>' : ''}
+              ${(session?.goals || []).length === 0 && session ? '<p style="font-size:0.8125rem;color:var(--text-400)">No goals yet — add one above</p>' : ''}
+              ${(session?.goals || []).map(g => `
+                <div style="display:flex;align-items:center;gap:0.5rem">
+                  <label class="checkbox-group" style="flex:1" data-goal="${g.id}">
+                    <input type="checkbox" ${g.completed ? 'checked' : ''} onchange="App._toggleGoal('${g.id}')">
+                    <span style="font-size:0.875rem;${g.completed ? 'text-decoration:line-through;opacity:0.5' : ''}">${Utils.escapeHtml(g.text)}</span>
+                  </label>
+                  <button onclick="App._removeGoal('${g.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-400);padding:0.25rem" title="Remove goal">
+                    <span class="material-symbols-outlined" style="font-size:0.875rem">close</span>
+                  </button>
+                </div>
               `).join('')}
             </div>
           </div>
@@ -242,13 +255,13 @@ const App = (() => {
             </h4>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem 2rem">
               ${cats.map(c => {
-        const score = Math.min(categoryScores[c], 5);
-        const pct = (score / 5) * 100;
-        return `<div class="progress-group">
+      const score = Math.min(categoryScores[c], 5);
+      const pct = (score / 5) * 100;
+      return `<div class="progress-group">
                   <div class="progress-header"><span>${scoreLabels[c]}</span><span class="progress-value">${score}/5</span></div>
                   <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
                 </div>`;
-      }).join('')}
+    }).join('')}
             </div>
           </div>
         </div>
@@ -362,6 +375,96 @@ const App = (() => {
 
   function _toggleGoal(goalId) {
     Session.toggleGoal(goalId);
+    navigate('session');
+  }
+
+  function _addGoal() {
+    const input = document.getElementById('goal-input');
+    if (!input || !input.value.trim()) return;
+    Session.addGoal(input.value.trim());
+    navigate('session');
+  }
+
+  function _removeGoal(goalId) {
+    Session.removeGoal(goalId);
+    navigate('session');
+  }
+
+  /** Show session end summary modal */
+  function _showSessionEndSummary(session, incidents) {
+    const duration = session.duration ? Utils.formatTimer(session.duration) : '—';
+    const goalsCompleted = (session.goals || []).filter(g => g.completed).length;
+    const goalsTotal = (session.goals || []).length;
+    const sevCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    incidents.forEach(i => { if (sevCounts[i.severity] !== undefined) sevCounts[i.severity]++; });
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay active';
+    overlay.id = 'session-end-modal';
+    overlay.innerHTML = `
+      <div class="modal-card" style="max-width:640px">
+        <div class="modal-header" style="background:linear-gradient(135deg,#2b6cee,#818cf8);color:#fff;padding:2rem">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+            <span class="material-symbols-outlined" style="font-size:1.5rem">flag</span>
+            <h2 style="font-size:1.5rem;font-weight:900">Session Complete</h2>
+          </div>
+          <p style="opacity:0.8;font-size:0.875rem">${Utils.escapeHtml(session.studentName)} — ${duration}</p>
+        </div>
+        <div class="modal-body" style="padding:1.5rem 2rem">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+            <div style="text-align:center;padding:1rem;background:var(--text-100);border-radius:var(--radius-xl)">
+              <div style="font-size:1.5rem;font-weight:700;color:var(--primary)">${duration}</div>
+              <div style="font-size:0.625rem;text-transform:uppercase;color:var(--text-500);font-weight:700">Duration</div>
+            </div>
+            <div style="text-align:center;padding:1rem;background:var(--text-100);border-radius:var(--radius-xl)">
+              <div style="font-size:1.5rem;font-weight:700;color:${incidents.length === 0 ? 'var(--emerald)' : 'var(--text-900)'}">${incidents.length}</div>
+              <div style="font-size:0.625rem;text-transform:uppercase;color:var(--text-500);font-weight:700">Incidents</div>
+            </div>
+            <div style="text-align:center;padding:1rem;background:var(--text-100);border-radius:var(--radius-xl)">
+              <div style="font-size:1.5rem;font-weight:700;color:${sevCounts[3] + sevCounts[4] > 0 ? '#f43f5e' : 'var(--emerald)'}">${sevCounts[3] + sevCounts[4]}</div>
+              <div style="font-size:0.625rem;text-transform:uppercase;color:var(--text-500);font-weight:700">Major/Critical</div>
+            </div>
+            <div style="text-align:center;padding:1rem;background:var(--text-100);border-radius:var(--radius-xl)">
+              <div style="font-size:1.5rem;font-weight:700;color:var(--primary)">${goalsCompleted}/${goalsTotal}</div>
+              <div style="font-size:0.625rem;text-transform:uppercase;color:var(--text-500);font-weight:700">Goals Done</div>
+            </div>
+          </div>
+
+          ${incidents.length > 0 ? `
+            <div style="margin-bottom:1rem">
+              <p style="font-size:0.75rem;font-weight:700;color:var(--text-500);text-transform:uppercase;margin-bottom:0.5rem">Incidents During Session</p>
+              <div style="max-height:180px;overflow-y:auto;border:1px solid var(--border-light);border-radius:var(--radius);padding:0.5rem">
+                ${incidents.map(inc => {
+      const cat = Methodology.getCategoryMeta(inc.category);
+      const sev = Methodology.getSeverityMeta(inc.severity);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem;border-bottom:1px solid var(--text-100)">
+                    <div style="display:flex;align-items:center;gap:0.5rem">
+                      <span class="badge ${sev.badge}" style="font-size:0.5625rem">${sev.label}</span>
+                      <span style="font-size:0.8125rem;font-weight:600">${Utils.escapeHtml(cat.label)}</span>
+                    </div>
+                    <span style="font-size:0.75rem;color:var(--text-400)">${Utils.formatDateTime(inc.timestamp)}</span>
+                  </div>`;
+    }).join('')}
+              </div>
+            </div>
+          ` : '<div style="text-align:center;padding:1.5rem;color:var(--emerald)"><span class="material-symbols-outlined" style="font-size:2rem;display:block;margin-bottom:0.5rem">emoji_events</span><p style="font-weight:700">Clean session — no incidents!</p></div>'}
+        </div>
+        <div class="modal-footer" style="flex-wrap:wrap;gap:0.5rem">
+          <button class="btn btn-outline btn-sm" id="btn-export-session-pdf"><span class="material-symbols-outlined" style="font-size:1rem">picture_as_pdf</span> Export PDF</button>
+          <button class="btn btn-outline btn-sm" id="btn-export-session-csv"><span class="material-symbols-outlined" style="font-size:1rem">download</span> Export CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="document.getElementById('session-end-modal').remove()">Done</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Bind export buttons with closure data (avoids JSON in data attributes)
+    document.getElementById('btn-export-session-pdf').addEventListener('click', () => {
+      Export.downloadSessionPDF(session, incidents);
+    });
+    document.getElementById('btn-export-session-csv').addEventListener('click', () => {
+      Export.downloadCSV(incidents);
+    });
   }
 
   // ===================== RULES VIEW =====================
@@ -672,7 +775,8 @@ const App = (() => {
         </div>
         <div class="page-header-actions">
           <button class="btn btn-primary" onclick="App._openIncidentModal()"><span class="material-symbols-outlined" style="font-size:1.125rem">add_circle</span> Log Incident</button>
-          <button class="btn btn-outline" onclick="Export.downloadCSV()"><span class="material-symbols-outlined" style="font-size:1.125rem">download</span> Export</button>
+          <button class="btn btn-outline" onclick="Export.downloadPDF()"><span class="material-symbols-outlined" style="font-size:1.125rem">picture_as_pdf</span> PDF</button>
+          <button class="btn btn-outline" onclick="Export.downloadCSV()"><span class="material-symbols-outlined" style="font-size:1.125rem">download</span> CSV</button>
         </div>
       </div>
 
@@ -1150,7 +1254,8 @@ const App = (() => {
   return {
     init, navigate, currentPage, showToast,
     _quickLog, _openIncidentModal, _closeIncidentModal, _submitIncident,
-    _applyAction, _toggleGoal, _filterIncidents, _goToIncidentPage,
+    _applyAction, _toggleGoal, _addGoal, _removeGoal,
+    _filterIncidents, _goToIncidentPage,
     _switchMethodologyTab, _saveMethodology, _resetMethodology,
     _saveSettings, _testConnection,
     _changeStudentAndRefresh, _renderIncidents, _viewIncidentDetail,

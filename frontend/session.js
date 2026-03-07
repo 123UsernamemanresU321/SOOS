@@ -159,5 +159,12 @@ const Session = (() => {
         }
     }
 
-    return { start, pause, resume, end, getCurrent, isActive, getElapsed, updateState, addGoal, toggleGoal };
+    /** Remove a goal from the session */
+    function removeGoal(goalId) {
+        if (!_current) return;
+        _current.goals = _current.goals.filter(g => g.id !== goalId);
+        DB.put('sessions', _current);
+    }
+
+    return { start, pause, resume, end, getCurrent, isActive, getElapsed, updateState, addGoal, toggleGoal, removeGoal };
 })();
