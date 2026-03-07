@@ -157,5 +157,26 @@ const Incidents = (() => {
         return { items, page, perPage, totalPages, total: all.length };
     }
 
-    return { log, analyze, applyAction, getAll, getStats, getPaginated };
+    /** Update incident status with optional reason */
+    async function updateStatus(incidentId, newStatus, reason) {
+        const incident = await DB.get('incidents', incidentId);
+        if (!incident) return null;
+        incident.status = newStatus;
+        if (reason) {
+            incident.statusReason = reason;
+            incident.statusUpdatedAt = Utils.now();
+        }
+        await DB.put('incidents', incident);
+        return incident;
+    }
+
+    /** Clear all incidents from the database */
+    async function clearAll() {
+        const incidents = await DB.getAll('incidents');
+        for (const inc of incidents) {
+            await DB.remove('incidents', inc.id);
+        }
+    }
+
+    return { log, analyze, applyAction, getAll, getStats, getPaginated, updateStatus, clearAll };
 })();
