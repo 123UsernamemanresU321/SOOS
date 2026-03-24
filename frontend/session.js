@@ -1,12 +1,21 @@
 /* ============================================================
    SESSION ORDER OS — Session Management
+   Uses wall-clock timestamps so the timer stays accurate even
+   when the browser tab is in the background.
    ============================================================ */
 
 const Session = (() => {
-    let _current = null;    // Current session object
-    let _timer = null;      // Timer interval ID
-    let _elapsed = 0;       // Elapsed seconds
+    let _current = null;       // Current session object
+    let _timer = null;         // Timer interval ID
+    let _startedAt = 0;        // Date.now() when timer last (re)started
+    let _accumulatedMs = 0;    // Milliseconds accumulated before the last pause
     let _paused = false;
+
+    /** Compute true elapsed seconds from wall-clock time */
+    function _computeElapsed() {
+        if (_paused || !_current) return Math.round(_accumulatedMs / 1000);
+        return Math.round((_accumulatedMs + (Date.now() - _startedAt)) / 1000);
+    }
 
     /** Start a new session for a student */
     async function start(studentId) {
@@ -29,7 +38,7 @@ const Session = (() => {
         };
 
         await DB.add('sessions', _current);
-        _elapsed = 0;
+        _accumulatedMs = 0;
         _paused = false;
         _startTimer();
         _updateTimerDisplay();
@@ -39,6 +48,8 @@ const Session = (() => {
     /** Pause current session */
     function pause() {
         if (!_current || _paused) return;
+        // Freeze accumulated time
+        _accumulatedMs += Date.now() - _startedAt;
         _paused = true;
         _current.status = 'paused';
         _stopTimer();
@@ -50,7 +61,7 @@ const Session = (() => {
         if (!_current || !_paused) return;
         _paused = false;
         _current.status = 'active';
-        _startTimer();
+        _startTimer();             // _startTimer sets _startedAt
         DB.put('sessions', _current);
     }
 
@@ -60,11 +71,11 @@ const Session = (() => {
         _stopTimer();
         _current.endTime = Utils.now();
         _current.status = 'ended';
-        _current.duration = _elapsed;
+        _current.duration = _computeElapsed();
         await DB.put('sessions', _current);
         const ended = _current;
         _current = null;
-        _elapsed = 0;
+        _accumulatedMs = 0;
         _updateTimerDisplay();
         return ended;
     }
@@ -72,7 +83,7 @@ const Session = (() => {
     /** Get current session */
     function getCurrent() { return _current; }
     function isActive() { return _current && _current.status === 'active'; }
-    function getElapsed() { return _elapsed; }
+    function getElapsed() { return _computeElapsed(); }
 
     /** Update session state based on incident count */
     async function updateState() {
@@ -116,12 +127,12 @@ const Session = (() => {
         }
     }
 
-    // --- Timer internals ---
+    // --- Timer internals (wall-clock based) ---
     function _startTimer() {
         _stopTimer();
+        _startedAt = Date.now();   // anchor for wall-clock diff
         _timer = setInterval(() => {
-            _elapsed++;
-            _updateTimerDisplay();
+            _updateTimerDisplay();  // just refreshes the display
         }, 1000);
     }
 
@@ -131,8 +142,16 @@ const Session = (() => {
 
     function _updateTimerDisplay() {
         const el = document.getElementById('session-timer-value');
-        if (el) el.textContent = Utils.formatTimer(_elapsed);
+        if (el) el.textContent = Utils.formatTimer(_computeElapsed());
     }
+
+    // When the tab regains focus, immediately refresh the display
+    // so the user sees the correct time right away.
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && _current && !_paused) {
+            _updateTimerDisplay();
+        }
+    });
 
     function _updateStateDisplay() {
         if (!_current) return;
